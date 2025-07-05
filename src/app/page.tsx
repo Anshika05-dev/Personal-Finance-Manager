@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { format, parseISO } from 'date-fns'
 
@@ -40,7 +40,6 @@ export default function Home() {
     setLoading(true)
 
     if (editingId) {
-      // Edit mode
       const res = await fetch(`/api/transactions/${editingId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -50,7 +49,6 @@ export default function Home() {
       setTransactions(transactions.map(txn => (txn._id === editingId ? updated : txn)))
       setEditingId(null)
     } else {
-      // Add mode
       const res = await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,19 +90,23 @@ export default function Home() {
   }))
 
   return (
-    <main className="max-w-3xl mx-auto p-4 space-y-8">
-      <h1 className="text-3xl font-bold">💸 Personal Finance Tracker</h1>
+    <main className="max-w-5xl mx-auto p-6 space-y-10">
+      <h1 className="text-4xl font-bold text-center">💸 Personal Finance Tracker</h1>
 
-      {/* Form */}
-      <Card>
-        <CardContent className="p-4 space-y-4">
+      {/* Form Section */}
+      <Card className="shadow-md border border-gray-200">
+        <CardHeader>
+          <CardTitle>{editingId ? 'Edit Transaction' : 'Add New Transaction'}</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label>Amount</Label>
+            <Label>Amount (₹)</Label>
             <Input
               type="number"
               name="amount"
               value={form.amount}
               onChange={handleChange}
+              placeholder="Enter amount"
             />
           </div>
           <div>
@@ -113,6 +115,7 @@ export default function Home() {
               name="description"
               value={form.description}
               onChange={handleChange}
+              placeholder="e.g. Groceries"
             />
           </div>
           <div>
@@ -124,48 +127,58 @@ export default function Home() {
               onChange={handleChange}
             />
           </div>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {editingId ? (loading ? 'Updating...' : 'Update Transaction') : loading ? 'Adding...' : 'Add Transaction'}
-          </Button>
+          <div className="md:col-span-3">
+            <Button className="w-full" onClick={handleSubmit} disabled={loading}>
+              {editingId ? (loading ? 'Updating...' : 'Update Transaction') : loading ? 'Adding...' : 'Add Transaction'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {/* Chart */}
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="font-semibold text-lg mb-4">📊 Monthly Expenses</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="amount" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
+      <Card className="shadow-md border border-gray-200">
+        <CardHeader>
+          <CardTitle>📊 Monthly Expenses</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          {chartData.length === 0 ? (
+            <p className="text-center text-muted-foreground">No transactions to show.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="amount" fill="#4f46e5" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
 
-      {/* List */}
-      <div className="space-y-2">
-        <h2 className="font-semibold text-lg">🧾 Transactions</h2>
+      {/* Transaction List */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">🧾 Transactions</h2>
         {transactions.length === 0 ? (
-          <p>No transactions yet.</p>
+          <p className="text-muted-foreground text-sm">No transactions found.</p>
         ) : (
-          transactions.map(txn => (
-            <Card key={txn._id}>
-              <CardContent className="p-4 flex justify-between items-center">
-                <div>
-                  <p className="font-medium">₹{txn.amount}</p>
-                  <p className="text-sm text-muted-foreground">{txn.description}</p>
-                  <p className="text-xs text-gray-400">{format(parseISO(txn.date), 'dd MMM yyyy')}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => handleEdit(txn)}>Edit</Button>
-                  <Button variant="destructive" onClick={() => handleDelete(txn._id)}>Delete</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {transactions.map(txn => (
+              <Card key={txn._id} className="shadow-sm border border-gray-200">
+                <CardContent className="p-4 space-y-1">
+                  <div className="flex justify-between items-center">
+                    <p className="text-lg font-semibold text-green-600">₹{txn.amount}</p>
+                    <p className="text-xs text-gray-400">{format(parseISO(txn.date), 'dd MMM yyyy')}</p>
+                  </div>
+                  <p className="text-sm">{txn.description}</p>
+                  <div className="flex gap-2 pt-3">
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(txn)}>Edit</Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(txn._id)}>Delete</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </main>
