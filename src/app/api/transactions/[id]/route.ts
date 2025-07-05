@@ -1,7 +1,7 @@
 // src/app/api/transactions/[id]/route.ts
 import { connectDB } from '@/lib/mongoose';
 import { Transaction } from '@/models/Transaction';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   await connectDB();
@@ -9,10 +9,23 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
   return NextResponse.json({ success: true });
 }
 
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-    await connectDB();
-    const body = await req.json();
-    const updated = await Transaction.findByIdAndUpdate(params.id, body, { new: true });
-    return NextResponse.json(updated);
+  if (!id) {
+    return NextResponse.json({ error: 'Transaction ID is required' }, { status: 400 })
   }
+
+  try {
+    const body = await req.json()
+    // Perform your update logic here (e.g., update the transaction in the database)
+    const updatedTransaction = {
+      id,
+      ...body,
+    }
+
+    return NextResponse.json(updatedTransaction, { status: 200 })
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update transaction' }, { status: 500 })
+  }
+}
