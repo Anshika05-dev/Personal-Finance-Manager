@@ -77,12 +77,12 @@ export default function Home() {
     setTransactions(transactions.filter(txn => txn._id !== _id))
   }
 
-  const monthlyData = transactions.reduce((acc: any, txn) => {
+  const monthlyData = transactions.reduce((acc: Record<string, number>, txn) => {
     const month = format(parseISO(txn.date), 'MMM yyyy')
     if (!acc[month]) acc[month] = 0
     acc[month] += txn.amount
     return acc
-  }, {})
+  }, {} as Record<string, number>)
 
   const chartData = Object.entries(monthlyData).map(([month, amount]) => ({
     month,
