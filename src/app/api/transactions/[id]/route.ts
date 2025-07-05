@@ -26,6 +26,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     return NextResponse.json(updatedTransaction, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update transaction' }, { status: 500 })
+    console.error('Error updating transaction:', error);
+    return NextResponse.json({ error: 'Failed to update transaction' }, { status: 500 });
   }
 }
