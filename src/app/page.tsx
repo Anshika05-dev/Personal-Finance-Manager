@@ -35,9 +35,13 @@ export default function Home() {
     setTransactions(data)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm(prevForm => ({
+      ...prevForm,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async () => {
     if (!form.amount || !form.description || !form.date) return alert('All fields required.')
