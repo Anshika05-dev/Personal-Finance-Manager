@@ -1,12 +1,23 @@
-// src/models/Transaction.ts
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const TransactionSchema = new mongoose.Schema({
-  amount: Number,
-  description: String,
-  date: Date,
-}, {
-  timestamps: true,
-});
+  amount: {
+    type: Number,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: String,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true,
+    default: 'Other'
+  }
+})
 
-export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);
+export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema)

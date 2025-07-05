@@ -8,15 +8,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { format, parseISO } from 'date-fns'
 
+const categories = ['Food', 'Travel', 'Bills', 'Shopping', 'Salary', 'Other']
+
+
 type Transaction = {
   _id?: string
   amount: number
   description: string
   date: string
+  category: string
 }
 
 export default function Home() {
-  const [form, setForm] = useState<Transaction>({ amount: 0, description: '', date: '' })
+  const [form, setForm] = useState<Transaction>({ amount: 0, description: '', date: '', category: 'Other' })
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -58,7 +62,7 @@ export default function Home() {
       setTransactions([newTxn, ...transactions])
     }
 
-    setForm({ amount: 0, description: '', date: '' })
+    setForm({ amount: 0, description: '', date: '' , category: 'Other' })
     setLoading(false)
   }
 
@@ -66,8 +70,10 @@ export default function Home() {
     setForm({
       amount: txn.amount,
       description: txn.description,
-      date: txn.date.slice(0, 10)
+      date: txn.date.slice(0, 10),
+      category: txn.category || 'Other'
     })
+    
     setEditingId(txn._id || null)
   }
 
@@ -118,6 +124,20 @@ export default function Home() {
               placeholder="e.g. Groceries"
             />
           </div>
+          <div>
+  <Label>Category</Label>
+  <select
+    name="category"
+    value={form.category}
+    onChange={handleChange}
+    className="w-full border rounded-md p-2"
+  >
+    {categories.map(cat => (
+      <option key={cat} value={cat}>{cat}</option>
+    ))}
+  </select>
+</div>
+
           <div>
             <Label>Date</Label>
             <Input
