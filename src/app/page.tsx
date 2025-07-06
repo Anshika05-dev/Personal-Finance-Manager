@@ -118,11 +118,14 @@ export default function Home() {
     amount,
   }));
 
-  const categoryData = transactions.reduce((acc: any, txn) => {
-    if (!acc[txn.category]) acc[txn.category] = 0;
-    acc[txn.category] += txn.amount;
-    return acc;
-  }, {});
+  const categoryData = transactions.reduce(
+    (acc: Record<string, number>, txn) => {
+      if (!acc[txn.category]) acc[txn.category] = 0;
+      acc[txn.category] += txn.amount;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const pieChartData = Object.entries(categoryData).map(
     ([category, amount]) => ({
